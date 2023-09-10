@@ -6,7 +6,7 @@ editor: visual
 embed-resources: true
 ---
 
-## 1. Read in the data
+## 1. Read in the data!
 
 ```{r}
 install.packages('R.utils')
