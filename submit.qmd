@@ -1,28 +1,142 @@
 ---
-title: ""
-author: ""
-format:
-  html:
-    embed-resources: true
+title: "Lab 3"
+author: "Karisa Ke"
+format: html
+editor: visual
+embed-resources: true
 ---
 
-## Quarto
+1. Read in the data
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+{r}
+download.file(
 
-## Running Code
+    "https://raw.githubusercontent.com/USCbiostats/data-science-data/master/02_met/met_all.gz",
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+    destfile = "met_all.gz",
 
-```{r}
-1 + 1
-```
+    method   = "libcurl",
 
-You can add options to executable code like this
+    timeout  = 60 )
 
-```{r}
-#| echo: false
-2 * 2
-```
+met <- data.table::fread("met_all.gz")
 
-The `echo: false` option disables the printing of code (only output is displayed).
+2. Check the dimensions, headers, footers. How many columns, rows are there?
+
+{r}
+dim(met)
+
+There are 2,377,343 rows and 30 columns in the met dataset.
+
+{r}
+head(met)
+
+{r}
+tail(met)
+
+3. Take a look at the variables.
+
+{r}
+str(met)
+
+4. Take a closer look at the key variables.
+
+{r}
+table(met$year)
+
+{r}
+table(met$day)
+
+{r}
+table(met$hour)
+
+{r}
+summary(met$temp)
+
+{r}
+summary(met$elev)
+
+{r}
+summary(met$wind.sp)
+
+{r}
+met[met$elev==9999.0] <- NA
+summary(met$elev)
+
+{r}
+met <- met[temp>-40]
+met2 <- met[order(temp)]
+head(met2)
+
+5. Check the data against an external data source.
+
+{r}
+met <- met[temp>-15]
+met2 <- met[order(temp)]
+head(met2)
+
+6. Calculate summary statistics.
+
+{r}
+elev <- met[elev==max(elev), ]
+summary(elev)
+
+{r}
+cor(elev$temp, elev$wind.sp, use="complete")
+
+{r}
+cor(elev$temp, elev$hour, use="complete")
+
+{r}
+cor(elev$wind.sp, elev$day, use="complete")
+
+{r}
+cor(elev$wind.sp, elev$hour, use="complete")
+
+{r}
+cor(elev$temp, elev$day, use="complete")
+
+7. Exploratory graphs
+
+{r}
+hist(met$elev, breaks=100)
+
+{r}
+hist(met$temp)
+
+{r}
+hist(met$wind.sp)
+
+{r}
+library(dplyr)
+library(leaflet)
+leaflet(elev) %>%
+  addProviderTiles('OpenStreetMap') %>%
+  addCircles(lat=~lat, lng=~lon, opacity=1, fillOpacity=1, radius=100)
+
+{r}
+library(lubridate)
+elev$date <- with(elev, ymd_h(paste(year, month, day, hour, sep=' ')))
+summary(elev$date)
+
+{r}
+elev <- elev[order(date)]
+head(elev)
+
+{r}
+plot(elev$date, elev$temp, type='l')
+
+{r}
+plot(elev$date, elev$wind.sp, type='l')
+
+The temperature changes over days and nights. In the middle August, the wind speed was higher. 
+
+8. Ask questions
+
+{r}
+install.packages("corrplot")
+
+{r}
+temp_wind <- data.frame(elev$temp, elev$wind.sp)
+pairs(temp_wind)
+
