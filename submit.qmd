@@ -9,6 +9,9 @@ embed-resources: true
 ## 1. Read in the data
 
 ```{r}
+install.packages('R.utils')
+library('R.utils')
+
 download.file(
 
     "https://raw.githubusercontent.com/USCbiostats/data-science-data/master/02_met/met_all.gz",
