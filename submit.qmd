@@ -6,9 +6,9 @@ editor: visual
 embed-resources: true
 ---
 
-1. Read in the data
+## 1. Read in the data
 
-{r}
+```{r}
 download.file(
 
     "https://raw.githubusercontent.com/USCbiostats/data-science-data/master/02_met/met_all.gz",
@@ -20,123 +20,152 @@ download.file(
     timeout  = 60 )
 
 met <- data.table::fread("met_all.gz")
+```
 
-2. Check the dimensions, headers, footers. How many columns, rows are there?
+## 2. Check the dimensions, headers, footers. How many columns, rows are there?
 
-{r}
+```{r}
 dim(met)
+```
 
 There are 2,377,343 rows and 30 columns in the met dataset.
 
-{r}
+```{r}
 head(met)
+```
 
-{r}
+```{r}
 tail(met)
+```
 
-3. Take a look at the variables.
+## 3. Take a look at the variables.
 
-{r}
+```{r}
 str(met)
+```
 
-4. Take a closer look at the key variables.
+## 4. Take a closer look at the key variables.
 
-{r}
+```{r}
 table(met$year)
+```
 
-{r}
+```{r}
 table(met$day)
+```
 
-{r}
+```{r}
 table(met$hour)
+```
 
-{r}
+```{r}
 summary(met$temp)
+```
 
-{r}
+```{r}
 summary(met$elev)
+```
 
-{r}
+```{r}
 summary(met$wind.sp)
+```
 
-{r}
+```{r}
 met[met$elev==9999.0] <- NA
 summary(met$elev)
+```
 
-{r}
+```{r}
 met <- met[temp>-40]
 met2 <- met[order(temp)]
 head(met2)
+```
 
-5. Check the data against an external data source.
+## 5. Check the data against an external data source.
 
-{r}
+```{r}
 met <- met[temp>-15]
 met2 <- met[order(temp)]
 head(met2)
+```
 
-6. Calculate summary statistics.
+## 6. Calculate summary statistics.
 
-{r}
+```{r}
 elev <- met[elev==max(elev), ]
 summary(elev)
+```
 
-{r}
+```{r}
 cor(elev$temp, elev$wind.sp, use="complete")
+```
 
-{r}
+```{r}
 cor(elev$temp, elev$hour, use="complete")
+```
 
-{r}
+```{r}
 cor(elev$wind.sp, elev$day, use="complete")
+```
 
-{r}
+```{r}
 cor(elev$wind.sp, elev$hour, use="complete")
+```
 
-{r}
+```{r}
 cor(elev$temp, elev$day, use="complete")
+```
 
-7. Exploratory graphs
+## 7. Exploratory graphs
 
-{r}
+```{r}
 hist(met$elev, breaks=100)
+```
 
-{r}
+```{r}
 hist(met$temp)
+```
 
-{r}
+```{r}
 hist(met$wind.sp)
+```
 
-{r}
+```{r}
 library(dplyr)
 library(leaflet)
 leaflet(elev) %>%
   addProviderTiles('OpenStreetMap') %>%
   addCircles(lat=~lat, lng=~lon, opacity=1, fillOpacity=1, radius=100)
+```
 
-{r}
+```{r}
 library(lubridate)
 elev$date <- with(elev, ymd_h(paste(year, month, day, hour, sep=' ')))
 summary(elev$date)
+```
 
-{r}
+```{r}
 elev <- elev[order(date)]
 head(elev)
+```
 
-{r}
+```{r}
 plot(elev$date, elev$temp, type='l')
+```
 
-{r}
+```{r}
 plot(elev$date, elev$wind.sp, type='l')
+```
 
-The temperature changes over days and nights. In the middle August, the wind speed was higher. 
+The temperature changes over days and nights. In the middle August, the wind speed was higher.
 
-8. Ask questions
+## 8. Ask questions
 
-{r}
+```{r}
 install.packages("corrplot")
+```
 
-{r}
+```{r}
 temp_wind <- data.frame(elev$temp, elev$wind.sp)
 pairs(temp_wind)
-
+```
